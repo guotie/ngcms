@@ -2,6 +2,7 @@ package models
 
 import (
 	"github.com/robfig/revel"
+	"strings"
 	"sync"
 	"time"
 )
@@ -23,14 +24,14 @@ type Node struct {
 	Followers   int
 
 	// private use
-	pid       int
+	pid       uint32
 	friendstr string
 }
 
 var (
 	nodelock    sync.RWMutex
 	nodes       []*Node          = make([]*Node, 0)
-	nodesbyID   map[int32]*Node  = make(map[int32]*Node)
+	nodesbyID   map[uint32]*Node = make(map[uint32]*Node)
 	nodesbyName map[string]*Node = make(map[string]*Node)
 )
 
@@ -117,14 +118,32 @@ func build_node_siblings(node *Node) {
 }
 
 func build_node_friends(node *Node) {
+	fs := strings.Split(node.friendstr, ",")
+	if len(fs) == 0 {
+		return
+	}
 
+	for _, f := range fs {
+		fn := strings.TrimSpace(f)
+		found := false
+		for _, n := range nodes {
+			if strings.EqualFold(n.Name, fn) {
+				node.Friends = append(node.Friends, n)
+				found = true
+				break
+			}
+		}
+		if !found {
+			revel.WARN.Printf("Not found node(%s) friend-node by name: %s\n", node.Name, fn)
+		}
+	}
 }
 
 func Get_node_by_id(id int) *Node {
 	nodelock.RLock()
 	defer nodelock.RUnlock()
 
-	node, ok := nodesbyID[int32(id)]
+	node, ok := nodesbyID[uint32(id)]
 	if !ok {
 		return nil
 	}
