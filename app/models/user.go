@@ -5,12 +5,7 @@ import (
 )
 
 type UserInfo struct {
-	Uid      int64
-	Descp    string
-	Github   string
-	Weibo    string
-	Blog     string
-	Location string
+	Uid int64
 }
 
 type User struct {
@@ -28,6 +23,17 @@ type User struct {
 	Protrait_l  string
 	Protrait_m  string
 	Protrait_s  string
+	Descp       string
+	Github      string
+	Weibo       string
+	Qzone       string
+	QQ          string
+	Blog        string
+	Location    string
 
 	*UserInfo
+}
+
+func Register_user() {
+
 }
