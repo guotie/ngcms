@@ -122,7 +122,7 @@ func build_node_children(node *Node) {
 
 func build_node_siblings(node *Node) {
 	for _, s := range nodes {
-		if s.pid == node.pid {
+		if s.pid == node.pid && s.pid > 0 {
 			node.Silbings = append(node.Silbings, s)
 		}
 	}
@@ -248,6 +248,7 @@ func Modify_node(node *Node, pc bool) error {
 	return nil
 }
 
+// modify node's name
 func Modify_node_name(node *Node, nname string) {
 	var (
 		fs    []string
@@ -288,6 +289,7 @@ func Modify_node_name(node *Node, nname string) {
 	node.Name = nname
 }
 
+// modify node's parent id
 func Modify_node_pid(node *Node, npid int) {
 	_, err := db.Exec(`UPDATE nodes SET pid=? where id=?;`, npid, node.Id)
 	if err != nil {
@@ -300,6 +302,7 @@ func Modify_node_pid(node *Node, npid int) {
 	build_nodes_relations()
 }
 
+// delete node
 func Del_node(node *Node) error {
 	var id int
 	err := db.QueryRow(`SELECT id from nodes where pid=?;`, node.Id).Scan(&id)
@@ -330,6 +333,7 @@ func Del_node(node *Node) error {
 	return nil
 }
 
+// delete all nodes
 func Clear_all_nodes() {
 	_, err := db.Exec(`truncate nodes;`)
 	if err != nil {
