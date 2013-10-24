@@ -1,0 +1,31 @@
+{{set . "title" "Home"}}
+{{append . "moreStyles" "um/themes/default/css/umeditor.min.css"}}
+{{append . "moreScripts" "um/umeditor.config.js"}}
+{{append . "moreScripts" "um/umeditor.min.js"}}
+{{template "header.html" .}}
+
+<header class="hero-unit" style="background-color:#A9F16C">
+  <div class="container">
+    <div class="row">
+      <div class="hero-text">
+        <h1>发布文章</h1>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+  <div class="row">
+<textarea id="topicEditor" name="topicEditor"></textarea>  
+<SCRIPT type=text/javascript>
+    var editor = UM.getEditor('topicEditor');
+</SCRIPT>
+  </div>
+  <div class="row">
+    <div class="span6">
+      {{template "flash.html" .}}
+    </div>
+  </div>
+</div>
+
+{{template "footer.html" .}}

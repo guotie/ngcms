@@ -147,7 +147,7 @@ func (t *Topic) GetNode() {
 		return
 	}
 
-	t.Node = Get_node_by_id(t.Nid)
+	t.Node = Get_node_by_id(int(t.Nid))
 }
 
 func (t *Topic) Reply() {
