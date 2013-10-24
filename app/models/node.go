@@ -17,6 +17,7 @@ type Node struct {
 	Children    []*Node
 	Silbings    []*Node
 	Friends     []*Node
+	Depth       int
 	Descp       string
 	Extra_desc  string
 	Protrait_xl string // 480 * 480
@@ -34,6 +35,9 @@ type Node struct {
 
 var (
 	nodelock    sync.RWMutex
+	catalogs    []*Node          // node of depth = 1
+	subcatas    []*Node          // nodes of depth = 2
+	leafnodes   []*Node          //node of depth = 3
 	nodes       []*Node          = make([]*Node, 0)
 	nodesbyID   map[uint32]*Node = make(map[uint32]*Node)
 	nodesbyName map[string]*Node = make(map[string]*Node)
@@ -44,6 +48,7 @@ Node 表结构如下
 CREATE TABLE IF NOT EXISTS `nodes` (
 	`id` INT(10) NOT NULL,
 	`name` VARCHAR(50) NOT NULL,
+	`depth` INT NOT NULL DEFAULT '0',
 	`descp` VARCHAR(500) NULL DEFAULT '',
 	`extra_desc` VARCHAR(500) NULL DEFAULT '',
 	`pid` INT NULL DEFAULT '0',
@@ -61,7 +66,7 @@ ENGINE=InnoDB;
 
 func init_nodes() {
 	db := get_db()
-	rows, err := db.Query(`SELECT id, name, descp, extra_desc, pid, friends, protrait_xl, protrait_l, protrait_m, protrait_s, followers, createtm FROM nodes;`)
+	rows, err := db.Query(`SELECT id, name, depth, descp, extra_desc, pid, friends, protrait_xl, protrait_l, protrait_m, protrait_s, followers, createtm FROM nodes;`)
 	if err != nil {
 		revel.ERROR.Panicf("select table nodes failed: %s\n", err.Error())
 	}
@@ -69,7 +74,7 @@ func init_nodes() {
 
 	for rows.Next() {
 		node := new(Node)
-		err := rows.Scan(&node.Id, &node.Name, &node.Descp, &node.Extra_desc, &node.pid,
+		err := rows.Scan(&node.Id, &node.Name, &node.Depth, &node.Descp, &node.Extra_desc, &node.pid,
 			&node.friendstr, &node.Protrait_xl, &node.Protrait_l, &node.Protrait_m, &node.Protrait_s,
 			&node.Followers, &node.createtm)
 		if err != nil {
@@ -84,6 +89,21 @@ func init_nodes() {
 	}
 
 	build_nodes_relations()
+
+	catalogs = make([]*Node, 0)
+	subcatas = make([]*Node, 0)
+	leafnodes = make([]*Node, 0)
+	for _, n := range nodes {
+		if n.Depth == 1 {
+			catalogs = append(catalogs, n)
+		} else if n.Depth == 2 {
+			subcatas = append(subcatas, n)
+		} else if n.Depth == 3 {
+			leafnodes = append(leafnodes, n)
+		} else {
+			panic(fmt.Sprintf("Node (%s %d) depth invalid: %d\n", n.Name, n.Id, n.Depth))
+		}
+	}
 }
 
 // 建立node之间的关系
@@ -178,9 +198,11 @@ func Get_node_by_name(name string) *Node {
 // add new node
 func Add_new_node(name, descp, extra_desc string, pid int, friends, protrait string) (node *Node, err error) {
 	var (
-		id  int64
-		res sql.Result
+		id    int64
+		res   sql.Result
+		depth int
 	)
+
 	if err = db.Ping(); err != nil {
 		return nil, fmt.Errorf("Cannot connect to database: %s\n", err.Error())
 	}
@@ -193,9 +215,23 @@ func Add_new_node(name, descp, extra_desc string, pid int, friends, protrait str
 		return nil, fmt.Errorf("Node's description should not be empty.\n")
 	}
 
+	if pid > 0 {
+		parent := Get_node_by_id(pid)
+		if parent == nil {
+			return nil, fmt.Errorf("Parent node(id=%d) not exists.\n", pid)
+		}
+		if parent.Depth >= 2 {
+			return nil, fmt.Errorf("Parent node's Depth is %d, cannot add child node.\n", parent.Depth)
+		}
+		depth = parent.Depth + 1
+	} else {
+		depth = 1
+	}
+
 	node = &Node{Name: name,
 		Descp:       descp,
 		Extra_desc:  extra_desc,
+		Depth:       depth,
 		pid:         uint32(pid),
 		Protrait_xl: protrait,
 		Protrait_l:  protrait,
@@ -207,8 +243,8 @@ func Add_new_node(name, descp, extra_desc string, pid int, friends, protrait str
 		friendstr:   friends,
 	}
 
-	res, err = db.Exec(`INSERT INTO nodes (name, descp, extra_desc, pid, createtm, friends, protrait_xl, protrait_l, protrait_m, protrait_s) VALUES(?,?,?,?,?,?,?,?,?);`,
-		node.Name, node.Descp, node.Extra_desc, node.pid, node.createtm, node.friendstr, node.Protrait_xl, node.Protrait_l, node.Protrait_m, node.Protrait_s)
+	res, err = db.Exec(`INSERT INTO nodes (name, depth, descp, extra_desc, pid, createtm, friends, protrait_xl, protrait_l, protrait_m, protrait_s) VALUES(?,?,?,?,?,?,?,?,?);`,
+		node.Name, node.Depth, node.Descp, node.Extra_desc, node.pid, node.createtm, node.friendstr, node.Protrait_xl, node.Protrait_l, node.Protrait_m, node.Protrait_s)
 	if err != nil {
 		return nil, err
 	}
@@ -222,6 +258,11 @@ func Add_new_node(name, descp, extra_desc string, pid int, friends, protrait str
 	nodelock.Lock()
 	nodes = append(nodes, node)
 	build_nodes_relations()
+	if node.Depth == 1 {
+		catalogs = append(catalogs, node)
+	} else if node.Depth == 2 {
+		subcatas = append(subcatas, node)
+	}
 	nodelock.Unlock()
 
 	return node, nil
