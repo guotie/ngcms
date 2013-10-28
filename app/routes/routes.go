@@ -15,6 +15,15 @@ func (_ tApp) Index(
 	return revel.MainRouter.Reverse("App.Index", args).Url
 }
 
+func (_ tApp) Captcha(
+		id string,
+		) string {
+	args := make(map[string]string)
+	
+	revel.Unbind(args, "id", id)
+	return revel.MainRouter.Reverse("App.Captcha", args).Url
+}
+
 func (_ tApp) NewTopic(
 		) string {
 	args := make(map[string]string)

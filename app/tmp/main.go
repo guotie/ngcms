@@ -40,11 +40,20 @@ func main() {
 				},
 			},
 			&revel.MethodType{
+				Name: "Captcha",
+				Args: []*revel.MethodArg{ 
+					&revel.MethodArg{Name: "id", Type: reflect.TypeOf((*string)(nil)) },
+				},
+				RenderArgNames: map[int][]string{ 
+				},
+			},
+			&revel.MethodType{
 				Name: "NewTopic",
 				Args: []*revel.MethodArg{ 
 				},
 				RenderArgNames: map[int][]string{ 
-					8: []string{ 
+					14: []string{ 
+						"captchaId",
 					},
 				},
 			},
@@ -53,7 +62,7 @@ func main() {
 				Args: []*revel.MethodArg{ 
 				},
 				RenderArgNames: map[int][]string{ 
-					12: []string{ 
+					18: []string{ 
 					},
 				},
 			},
