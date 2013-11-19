@@ -4316,31 +4316,17 @@ textarea.input-group-sm > .input-group-btn > .btn {
   border-top-left-radius: 0;
 }
 
-.navbar {
+.upper-navbar {
   position: relative;
-  min-height: 50px;
-  margin-bottom: 20px;
+  min-height: 30px;
   border: 1px solid transparent;
 }
 
-.navbar:before,
-.navbar:after {
-  display: table;
-  content: " ";
-}
-
-.navbar:after {
-  clear: both;
-}
-
-.navbar:before,
-.navbar:after {
-  display: table;
-  content: " ";
-}
-
-.navbar:after {
-  clear: both;
+.navbar {
+  position: relative;
+  min-height: 50px;
+  margin-bottom: 5px;
+  border: 1px solid transparent;
 }
 
 @media (min-width: 768px) {
@@ -4488,7 +4474,7 @@ textarea.input-group-sm > .input-group-btn > .btn {
 
 .navbar-brand {
   float: left;
-  padding: 15px 15px;
+  padding: 5px 15px;
   font-size: 18px;
   line-height: 20px;
 }
@@ -4573,14 +4559,21 @@ textarea.input-group-sm > .input-group-btn > .btn {
   }
   .navbar-nav > li {
     float: left;
+	padding-right: 8px;
+	padding-left:  8px;
   }
   .navbar-nav > li > a {
     padding-top: 15px;
-    padding-bottom: 15px;
+    padding-bottom: 10px;
+	padding-right: 8px;
+	padding-left:  8px;
   }
-}
 
-@media (min-width: 768px) {
+  .navbar-nav.upper > li > a {
+    padding-top: 5px;
+    padding-bottom: 5px;
+  }
+
   .navbar-left {
     float: left !important;
   }
@@ -4679,7 +4672,7 @@ textarea.input-group-sm > .input-group-btn > .btn {
 }
 
 .navbar-default {
-  background-color: #f8f8f8;
+  background-color: #efebe2;
   border-color: #e7e7e7;
 }
 
@@ -4705,13 +4698,22 @@ textarea.input-group-sm > .input-group-btn > .btn {
 .navbar-default .navbar-nav > li > a:focus {
   color: #333333;
   background-color: transparent;
+  border-bottom: solid green 3px;
+}
+
+.navbar-nav.upper > li > a:hover,
+.navbar-nav.upper > li > a:focus {
+  color: red;
+  background-color: transparent;
+  border-bottom: none;
 }
 
 .navbar-default .navbar-nav > .active > a,
 .navbar-default .navbar-nav > .active > a:hover,
 .navbar-default .navbar-nav > .active > a:focus {
   color: #555555;
-  background-color: #e7e7e7;
+  /*background-color: #e7e7e7;*/
+  border-bottom: solid #f00 3px;
 }
 
 .navbar-default .navbar-nav > .disabled > a,
