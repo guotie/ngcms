@@ -7,8 +7,14 @@
 .thread.even  > .row{ background: #efebe2;}
 .uface {width: 48px; height: 48px; }
 .thread-title , .thread-brief {padding-right: 255px;}
+.thread-logo > img { max-width: 225px; max-height: 225px;}
 .thread-title { padding-top: 10px; padding-bottom: 15px; padding-left: 3px; font-size: 16px; }
 
 .thread-brief { line-height: 180%; color: #666; padding-left: 5px;}
-.thread-logo > img { max-width: 225px; max-height: 225px;}
-.thread-info { border-bottom: 1px solid #1abc9c; padding: 4px 4px 8px 5px; }
+.thread-info { border-bottom: 1px solid #1abc9c; padding: 4px 4px 8px 0; }
+.avatar img { margin-right: 15px; }
+.thread-tm { color: #ccc; font-size: 12px; padding-top: 10px;}
+.col-md-4.thread-catalog { font-size: 16px; padding: 0 5px; margin-top: 16px; }
+.col-md-4.thread-catalog > span {background: #8de2ff; padding: 10px 15px;}
+
+.thread-stat {margin-top: 10px; }
